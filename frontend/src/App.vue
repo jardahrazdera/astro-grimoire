@@ -9,7 +9,8 @@ import {
   Loader2, 
   Sparkles,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Search
 } from 'lucide-vue-next';
 
 // --- State ---
@@ -17,12 +18,43 @@ const loading = ref(false);
 const error = ref(null);
 const astroData = ref(null);
 
-// Form Inputs (Default: Prušánky)
+// Form Inputs
+const searchQuery = ref('Prušánky');
 const lat = ref(48.85);
 const lon = ref(16.98);
 const date = ref(new Date().toISOString().split('T')[0]);
+const isSearching = ref(false);
+const showCoords = ref(false);
 
-// --- API Call ---
+// --- API Calls ---
+
+const searchLocation = async () => {
+  if (!searchQuery.value) return;
+  isSearching.value = true;
+  error.value = null;
+  
+  try {
+    const response = await axios.get('http://localhost:8000/search-location', {
+      params: { q: searchQuery.value }
+    });
+    
+    if (response.data && response.data.length > 0) {
+      const loc = response.data[0];
+      lat.value = loc.lat;
+      lon.value = loc.lon;
+      // Trigger astro data fetch immediately after finding location
+      await fetchData();
+    } else {
+      error.value = "Location not found in the star charts.";
+    }
+  } catch (err) {
+    error.value = "Could not consult the cartographer (Geocoding Error)";
+    console.error(err);
+  } finally {
+    isSearching.value = false;
+  }
+};
+
 const fetchData = async () => {
   loading.value = true;
   error.value = null;
@@ -74,36 +106,62 @@ const formatTime = (isoString) => {
 
     <!-- Controls / Input -->
     <section class="z-10 w-full max-w-4xl mb-12">
-      <div class="glass-panel p-6 flex flex-col md:flex-row gap-6 items-end justify-center">
+      <div class="glass-panel p-6 flex flex-col gap-6">
         
-        <div class="flex-1 w-full">
-          <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Latitude</label>
-          <div class="relative">
-            <MapPin class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
-            <input v-model="lat" type="number" step="0.01" class="input-field pl-10" placeholder="48.85" />
-          </div>
+        <div class="flex flex-col md:flex-row gap-4">
+            <!-- Search Bar -->
+            <div class="flex-1 relative group">
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Location</label>
+              <div class="relative flex items-center">
+                  <MapPin class="absolute left-3 text-emerald-500 w-4 h-4" />
+                  <input 
+                    v-model="searchQuery" 
+                    @keyup.enter="searchLocation"
+                    type="text" 
+                    class="input-field pl-10 pr-12" 
+                    placeholder="Enter city (e.g. Prague, Salem)" 
+                  />
+                  <button 
+                    @click="searchLocation"
+                    class="absolute right-2 p-1.5 rounded-md hover:bg-emerald-900/50 text-emerald-400 transition-colors"
+                    :disabled="isSearching"
+                  >
+                    <Loader2 v-if="isSearching" class="w-4 h-4 animate-spin" />
+                    <Search v-else class="w-4 h-4" />
+                  </button>
+              </div>
+            </div>
+
+            <!-- Date Picker -->
+            <div class="w-full md:w-auto md:min-w-[200px]">
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Date</label>
+              <div class="relative">
+                <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
+                <input v-model="date" type="date" class="input-field pl-10" />
+              </div>
+            </div>
+
+             <!-- Main Action -->
+            <div class="flex items-end">
+                <button @click="fetchData" :disabled="loading" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 h-[42px]">
+                <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
+                <span v-else>Consult Stars</span>
+                </button>
+            </div>
         </div>
 
-        <div class="flex-1 w-full">
-          <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Longitude</label>
-          <div class="relative">
-            <MapPin class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
-            <input v-model="lon" type="number" step="0.01" class="input-field pl-10" placeholder="16.98" />
-          </div>
+        <!-- Coordinates Toggle -->
+        <div class="text-xs text-center">
+            <button @click="showCoords = !showCoords" class="text-emerald-500/50 hover:text-emerald-400 underline decoration-dotted">
+                {{ showCoords ? 'Hide Coordinates' : 'Show Coordinates' }}
+            </button>
+            
+            <div v-if="showCoords" class="mt-2 flex justify-center gap-4 text-emerald-100/40 font-mono transition-all">
+                <span>Lat: {{ lat }}</span>
+                <span>Lon: {{ lon }}</span>
+            </div>
         </div>
 
-        <div class="flex-1 w-full">
-          <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Date</label>
-          <div class="relative">
-            <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
-            <input v-model="date" type="date" class="input-field pl-10" />
-          </div>
-        </div>
-
-        <button @click="fetchData" :disabled="loading" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2">
-          <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
-          <span v-else>Consult Stars</span>
-        </button>
       </div>
     </section>
 
