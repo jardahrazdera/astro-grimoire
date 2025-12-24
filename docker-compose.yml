@@ -1,0 +1,39 @@
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: astro-backend
+    # Map port 80 inside container to 8000 on localhost
+    ports:
+      - "8000:80"
+    # Mount volume for hot-reloading (changes in host reflect immediately in container)
+    volumes:
+      - ./backend/app:/app/backend/app
+    # Override default command to enable reload
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 80 --reload
+    environment:
+      - TZ=Europe/Prague
+    restart: unless-stopped
+    
+    # --- Traefik Configuration (Production Ready) ---
+    # Uncommment and adjust the Host rule when deploying to your server
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.astro-backend.rule=Host(`api.astro.example.com`)"
+    #   - "traefik.http.routers.astro-backend.entrypoints=websecure"
+    #   - "traefik.http.routers.astro-backend.tls.certresolver=myresolver"
+    #   - "traefik.http.services.astro-backend.loadbalancer.server.port=80"
+
+  # Frontend placeholder - we will configure this later when Vue setup is ready
+  # frontend:
+  #   build: ./frontend
+  #   container_name: astro-frontend
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - VITE_API_URL=http://backend:80
