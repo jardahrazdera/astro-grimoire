@@ -245,7 +245,7 @@ const formatTime = (isoString) => {
                     <ul>
                       <li 
                         v-for="(place, index) in suggestions" 
-                        :key|"index"
+                        :key="index"
                         @click="selectLocation(place)"
                         class="px-4 py-3 hover:bg-emerald-900/30 cursor-pointer border-b border-white/5 last:border-none transition-colors group"
                       >
