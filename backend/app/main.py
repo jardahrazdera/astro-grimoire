@@ -138,13 +138,13 @@ async def search_location(
     """
     try:
         geolocator = Nominatim(user_agent="astro_grimoire_app")
-        # Request more results to filter locally
-        locations = geolocator.geocode(q, language="en", addressdetails=True, exactly_one=False, limit=10)
+        # Request more results to filter locally and sort by importance
+        locations = geolocator.geocode(q, language="en", addressdetails=True, exactly_one=False, limit=100)
 
         if not locations:
             return []
 
-        results = []
+        candidates = []
         for location in locations:
             address = location.raw.get("address", {})
             country = address.get("country")
@@ -156,20 +156,24 @@ async def search_location(
             # Determine a short name
             short_name = city if city else location.address.split(",")[0]
 
-            # Filter: strict prefix match on the name
-            if short_name.lower().startswith(q.lower()):
-                results.append(LocationResult(
-                    name=short_name,
-                    display_name=location.address,
-                    lat=location.latitude,
-                    lon=location.longitude,
-                    country=country,
-                    state=state,
-                    city=city
-                ))
+            # Store result with importance for sorting
+            importance = location.raw.get("importance", 0)
+            result_obj = LocationResult(
+                name=short_name,
+                display_name=location.address,
+                lat=location.latitude,
+                lon=location.longitude,
+                country=country,
+                state=state,
+                city=city
+            )
+            candidates.append((importance, result_obj))
         
-        # Return top 5 filtered results
-        return results[:5]
+        # Sort by importance descending
+        candidates.sort(key=lambda x: x[0], reverse=True)
+
+        # Return top 10 results
+        return [c[1] for c in candidates[:10]]
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")
