@@ -13,6 +13,7 @@ import {
   Search,
   Crosshair
 } from 'lucide-vue-next';
+import MoonPhase from './components/MoonPhase.vue';
 
 // --- State ---
 const loading = ref(false);
@@ -329,9 +330,13 @@ const formatTime = (isoString) => {
         <h2 class="font-wicca text-2xl text-amber-100 mb-6 relative">Current Phase</h2>
         
         <!-- Simplified Moon Representation -->
-        <div class="relative w-32 h-32 mb-6 rounded-full shadow-[0_0_50px_rgba(255,255,255,0.1)] bg-slate-800 border border-slate-700 flex items-center justify-center">
-             <Moon class="w-16 h-16 text-mystic-silver drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]" />
-             <div class="absolute -bottom-2 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700">
+        <div class="relative w-32 h-32 mb-6 rounded-full shadow-[0_0_50px_rgba(255,255,255,0.1)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
+             <MoonPhase 
+                :percent="astroData.moon_phase.illumination_percent" 
+                :phase="astroData.moon_phase.phase_name"
+                :hemisphere="astroData.solstices_current_year.hemisphere"
+             />
+             <div class="absolute -bottom-2 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 z-10">
                 {{ astroData.moon_phase.illumination_percent }}%
              </div>
         </div>
