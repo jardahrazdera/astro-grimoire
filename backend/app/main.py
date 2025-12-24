@@ -17,6 +17,7 @@ import ephem
 import math
 from datetime import datetime, date
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict
 
@@ -25,6 +26,15 @@ app = FastAPI(
     title="AstroCalc API",
     description="API for calculating solstices, lunar phases, and celestial rise/set times.",
     version="1.0.0",
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ------------------------------------------------------------------------------
