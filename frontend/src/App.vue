@@ -357,8 +357,10 @@ const formatTime = (isoString) => {
                 :phase="astroData.moon_phase.phase_name"
                 :hemisphere="astroData.solstices_current_year.hemisphere"
              />
-             <div class="absolute -bottom-2 bg-slate-900 text-xs px-2 py-1 rounded border border-slate-700 z-10">
-                {{ astroData.moon_phase.illumination_percent }}%
+             <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                <span class="bg-midnight-950/40 backdrop-blur-[2px] px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-white/10 shadow-lg">
+                    {{ astroData.moon_phase.illumination_percent }}%
+                </span>
              </div>
         </div>
 
