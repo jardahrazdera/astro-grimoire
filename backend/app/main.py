@@ -13,13 +13,14 @@
 #   Access docs:    http://127.0.0.1:8000/docs
 # ------------------------------------------------------------------------------
 
-import ephem
-import math
 from datetime import datetime, date
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict
+from typing import Optional, Dict, List
+from geopy.geocoders import Nominatim
+import ephem
+import math
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -40,6 +41,13 @@ app.add_middleware(
 # ------------------------------------------------------------------------------
 # Data Models
 # ------------------------------------------------------------------------------
+
+
+class LocationResult(BaseModel):
+    name: str
+    lat: float
+    lon: float
+    country: Optional[str] = None
 
 
 class SolsticeData(BaseModel):
@@ -116,6 +124,39 @@ def get_moon_phase_name(lunation: float) -> str:
 async def root():
     """Health check endpoint."""
     return {"message": "AstroCalc API is running. Go to /docs for usage."}
+
+
+@app.get("/search-location", response_model=List[LocationResult], tags=["Location"])
+async def search_location(
+    q: str = Query(..., description="City or place name to search for (e.g. 'Prague')")
+):
+    """
+    Search for a location by name and return coordinates.
+    """
+    try:
+        geolocator = Nominatim(user_agent="astro_grimoire_app")
+        location = geolocator.geocode(q, language="en", addressdetails=True)
+
+        if not location:
+            return []
+
+        # We return a list to support future multiple results, but currently just one for simplicity
+        # or we could use geolocator.geocode(exactly_one=False) for multiple
+        # Let's keep it simple: top result.
+        
+        country = location.raw.get("address", {}).get("country")
+
+        return [
+            LocationResult(
+                name=location.address,
+                lat=location.latitude,
+                lon=location.longitude,
+                country=country
+            )
+        ]
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")
 
 
 @app.get("/astro-data", response_model=AstroResponse, tags=["Astronomy"])
