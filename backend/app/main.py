@@ -143,8 +143,8 @@ async def search_location(
             "q": q,
             "format": "json",
             "addressdetails": 1,
-            "limit": 50,
-            "dedupe": 0,
+            "limit": 100,
+            "dedupe": 0,  # Ensure we get duplicates/variants
             "accept-language": "en"
         }
         headers = {
@@ -160,34 +160,56 @@ async def search_location(
 
         candidates = []
         for loc in locations:
+            # Filter: only keep administrative boundaries or place markers (cities, towns, etc)
+            # This excludes 'highway', 'building', 'amenity', etc.
+            if loc.get("class") not in ["place", "boundary"]:
+                continue
+
             address = loc.get("address", {})
-            country = address.get("country")
-            state = address.get("state") or address.get("region")
+            city = address.get("city")
+            town = address.get("town")
+            village = address.get("village")
+            hamlet = address.get("hamlet")
+            suburb = address.get("suburb")
+            muni = address.get("municipality")
             
-            # Try to find a sensible "City" name
-            city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
+            place_name = city or town or village or hamlet or suburb or muni or loc.get("display_name", "").split(",")[0]
             
-            # Determine a short name
-            short_name = city if city else loc.get("display_name", "").split(",")[0]
+            # --- NAME FILTERING ---
+            query_lower = q.lower().strip()
+            possible_names = [city, town, village, hamlet, suburb, muni, loc.get("display_name", "").split(",")[0]]
+            
+            is_match = False
+            for name in possible_names:
+                # Check if query is a substring of any place name field
+                if name and query_lower in name.lower():
+                    is_match = True
+                    # If the name starts with the query, it's a better candidate for short_name
+                    if name.lower().startswith(query_lower):
+                        place_name = name
+                    break
+            
+            if not is_match:
+                continue
 
             # Store result with importance for sorting
             importance = loc.get("importance", 0)
             
             result_obj = LocationResult(
-                name=short_name,
+                name=place_name,
                 display_name=loc.get("display_name"),
                 lat=float(loc.get("lat")),
                 lon=float(loc.get("lon")),
-                country=country,
-                state=state,
-                city=city
+                country=address.get("country"),
+                state=address.get("state") or address.get("region"),
+                city=city or town or village
             )
             candidates.append((importance, result_obj))
         
         # Sort by importance descending
         candidates.sort(key=lambda x: x[0], reverse=True)
 
-        # Return top 30 results
+        # Return top 30 filtered results
         return [c[1] for c in candidates[:30]]
 
     except Exception as e:
