@@ -21,6 +21,7 @@ from typing import Optional, Dict, List
 from geopy.geocoders import Nominatim
 import ephem
 import math
+import requests
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -137,16 +138,29 @@ async def search_location(
     Search for a location by name and return coordinates with details.
     """
     try:
-        geolocator = Nominatim(user_agent="astro_grimoire_app")
-        # Request more results to filter locally and sort by importance
-        locations = geolocator.geocode(q, language="en", addressdetails=True, exactly_one=False, limit=100)
+        url = "https://nominatim.openstreetmap.org/search"
+        params = {
+            "q": q,
+            "format": "json",
+            "addressdetails": 1,
+            "limit": 50,
+            "dedupe": 0,
+            "accept-language": "en"
+        }
+        headers = {
+            "User-Agent": "astro_grimoire_app/1.0"
+        }
+        
+        resp = requests.get(url, params=params, headers=headers)
+        resp.raise_for_status()
+        locations = resp.json()
 
         if not locations:
             return []
 
         candidates = []
-        for location in locations:
-            address = location.raw.get("address", {})
+        for loc in locations:
+            address = loc.get("address", {})
             country = address.get("country")
             state = address.get("state") or address.get("region")
             
@@ -154,15 +168,16 @@ async def search_location(
             city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
             
             # Determine a short name
-            short_name = city if city else location.address.split(",")[0]
+            short_name = city if city else loc.get("display_name", "").split(",")[0]
 
             # Store result with importance for sorting
-            importance = location.raw.get("importance", 0)
+            importance = loc.get("importance", 0)
+            
             result_obj = LocationResult(
                 name=short_name,
-                display_name=location.address,
-                lat=location.latitude,
-                lon=location.longitude,
+                display_name=loc.get("display_name"),
+                lat=float(loc.get("lat")),
+                lon=float(loc.get("lon")),
                 country=country,
                 state=state,
                 city=city
@@ -172,8 +187,8 @@ async def search_location(
         # Sort by importance descending
         candidates.sort(key=lambda x: x[0], reverse=True)
 
-        # Return top 10 results
-        return [c[1] for c in candidates[:10]]
+        # Return top 30 results
+        return [c[1] for c in candidates[:30]]
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")

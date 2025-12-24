@@ -3,3 +3,4 @@ uvicorn
 ephem
 pydantic
 geopy
+requests
