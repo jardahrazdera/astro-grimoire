@@ -169,6 +169,46 @@ async def search_location(
         raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")
 
 
+@app.get("/reverse-geocode", response_model=LocationResult, tags=["Location"])
+async def reverse_geocode(
+    lat: float = Query(..., description="Latitude"),
+    lon: float = Query(..., description="Longitude")
+):
+    """
+    Find location details from coordinates.
+    """
+    try:
+        geolocator = Nominatim(user_agent="astro_grimoire_app")
+        location = geolocator.reverse((lat, lon), language="en", addressdetails=True)
+
+        if not location:
+            raise HTTPException(status_code=404, detail="Location not found")
+
+        address = location.raw.get("address", {})
+        country = address.get("country")
+        state = address.get("state") or address.get("region")
+        
+        # Try to find a sensible "City" name
+        city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
+        
+        # Determine a short name
+        short_name = city if city else location.address.split(",")[0]
+
+        return LocationResult(
+            name=short_name,
+            display_name=location.address,
+            lat=lat,
+            lon=lon,
+            country=country,
+            state=state,
+            city=city
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")
+
+
+
 @app.get("/astro-data", response_model=AstroResponse, tags=["Astronomy"])
 async def get_astro_data(
     lat: float = Query(

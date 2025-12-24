@@ -10,7 +10,8 @@ import {
   Sparkles,
   ArrowUp,
   ArrowDown,
-  Search
+  Search,
+  Crosshair
 } from 'lucide-vue-next';
 
 // --- State ---
@@ -56,6 +57,49 @@ const searchLocation = async () => {
   } finally {
     isSearching.value = false;
   }
+};
+
+const getUserLocation = () => {
+  if (!navigator.geolocation) {
+    error.value = "Your browser does not support celestial positioning.";
+    return;
+  }
+  
+  isSearching.value = true;
+  error.value = null;
+  locationDetails.value = null;
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      try {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        
+        // Reverse Geocode
+        const response = await axios.get('http://localhost:8000/reverse-geocode', {
+          params: { lat: userLat, lon: userLon }
+        });
+        
+        const loc = response.data;
+        lat.value = loc.lat;
+        lon.value = loc.lon;
+        locationDetails.value = loc;
+        searchQuery.value = loc.name;
+        
+        await fetchData();
+      } catch (err) {
+         error.value = "Could not identify your realm from the stars.";
+         console.error(err);
+      } finally {
+        isSearching.value = false;
+      }
+    },
+    (err) => {
+      error.value = "Permission to view your realm was denied.";
+      isSearching.value = false;
+      console.error(err);
+    }
+  );
 };
 
 const fetchData = async () => {
@@ -121,17 +165,28 @@ const formatTime = (isoString) => {
                     v-model="searchQuery" 
                     @keyup.enter="searchLocation"
                     type="text" 
-                    class="input-field pl-10 pr-12" 
+                    class="input-field pl-10 pr-20" 
                     placeholder="Enter city (e.g. Prague, Salem)" 
                   />
-                  <button 
-                    @click="searchLocation"
-                    class="absolute right-2 p-1.5 rounded-md hover:bg-emerald-900/50 text-emerald-400 transition-colors"
-                    :disabled="isSearching"
-                  >
-                    <Loader2 v-if="isSearching" class="w-4 h-4 animate-spin" />
-                    <Search v-else class="w-4 h-4" />
-                  </button>
+                  <div class="absolute right-2 flex items-center gap-1">
+                      <button 
+                        @click="getUserLocation"
+                        class="p-1.5 rounded-md hover:bg-emerald-900/50 text-emerald-400 transition-colors"
+                        title="Use my location"
+                        :disabled="isSearching"
+                      >
+                         <Crosshair class="w-4 h-4" />
+                      </button>
+                      <div class="w-px h-4 bg-emerald-900/50"></div>
+                      <button 
+                        @click="searchLocation"
+                        class="p-1.5 rounded-md hover:bg-emerald-900/50 text-emerald-400 transition-colors"
+                        :disabled="isSearching"
+                      >
+                        <Loader2 v-if="isSearching" class="w-4 h-4 animate-spin" />
+                        <Search v-else class="w-4 h-4" />
+                      </button>
+                  </div>
               </div>
             </div>
 
