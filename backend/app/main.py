@@ -259,10 +259,10 @@ async def reverse_geocode(
 @app.get("/astro-data", response_model=AstroResponse, tags=["Astronomy"])
 async def get_astro_data(
     lat: float = Query(
-        ..., description="Latitude in decimal degrees (e.g., 48.85 for Prušánky)"
+        ..., description="Latitude in decimal degrees"
     ),
     lon: float = Query(
-        ..., description="Longitude in decimal degrees (e.g., 16.98 for Prušánky)"
+        ..., description="Longitude in decimal degrees"
     ),
     date_str: Optional[str] = Query(
         None, alias="date", description="Date in YYYY-MM-DD format. Defaults to today."

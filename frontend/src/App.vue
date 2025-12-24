@@ -20,9 +20,9 @@ const error = ref(null);
 const astroData = ref(null);
 
 // Form Inputs
-const searchQuery = ref('Prušánky');
-const lat = ref(48.85);
-const lon = ref(16.98);
+const searchQuery = ref('');
+const lat = ref(null);
+const lon = ref(null);
 const date = ref(new Date().toISOString().split('T')[0]);
 const isSearching = ref(false);
 const showCoords = ref(false);
@@ -178,7 +178,9 @@ const fetchData = async () => {
 
 // Initial fetch
 onMounted(() => {
-  fetchData();
+  if (lat.value && lon.value) {
+    fetchData();
+  }
 });
 
 // --- Formatters ---
@@ -271,7 +273,7 @@ const formatTime = (isoString) => {
 
              <!-- Main Action -->
             <div class="flex items-end">
-                <button @click="fetchData" :disabled="loading" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 h-[42px]">
+                <button @click="fetchData" :disabled="loading || !lat || !lon" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 h-[42px]">
                 <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
                 <span v-else>Consult Stars</span>
                 </button>
