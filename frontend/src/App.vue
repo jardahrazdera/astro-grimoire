@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { 
   Moon, 
@@ -28,13 +28,65 @@ const isSearching = ref(false);
 const showCoords = ref(false);
 const locationDetails = ref(null);
 
+// Autocomplete State
+const suggestions = ref([]);
+const showSuggestions = ref(false);
+let debounceTimeout = null;
+
 // --- API Calls ---
 
+const fetchSuggestions = async () => {
+  if (!searchQuery.value || searchQuery.value.length < 3) {
+    suggestions.value = [];
+    return;
+  }
+  
+  try {
+    const response = await axios.get('http://localhost:8000/search-location', {
+      params: { q: searchQuery.value }
+    });
+    suggestions.value = response.data || [];
+    showSuggestions.value = true;
+  } catch (err) {
+    console.error("Autocomplete error", err);
+  }
+};
+
+const selectLocation = async (loc) => {
+  searchQuery.value = loc.name;
+  lat.value = loc.lat;
+  lon.value = loc.lon;
+  locationDetails.value = loc;
+  showSuggestions.value = false;
+  suggestions.value = [];
+  
+  await fetchData();
+};
+
+// Watch input for autocomplete
+watch(searchQuery, (newVal) => {
+  if (debounceTimeout) clearTimeout(debounceTimeout);
+  
+  // If we just selected a location (and update the query), don't re-search immediately
+  // A simple check is if the new value matches the current selected location name, but 
+  // users might edit it. For now, just debounce.
+  
+  debounceTimeout = setTimeout(() => {
+    if (newVal && (!locationDetails.value || newVal !== locationDetails.value.name)) {
+        fetchSuggestions();
+    }
+  }, 500); // 500ms debounce
+});
+
 const searchLocation = async () => {
+  // If we have suggestions and the user hits enter, maybe pick the first one?
+  // Or just do a hard search. Let's do a hard search which is effectively the same 
+  // as the current logic but using the first result.
   if (!searchQuery.value) return;
   isSearching.value = true;
   error.value = null;
   locationDetails.value = null;
+  showSuggestions.value = false; // Hide dropdown on manual search
   
   try {
     const response = await axios.get('http://localhost:8000/search-location', {
@@ -152,7 +204,7 @@ const formatTime = (isoString) => {
     </header>
 
     <!-- Controls / Input -->
-    <section class="z-10 w-full max-w-5xl mb-12">
+    <section class="z-20 w-full max-w-5xl mb-12">
       <div class="glass-panel p-6 flex flex-col gap-6">
         
         <div class="flex flex-col md:flex-row gap-4">
@@ -186,6 +238,24 @@ const formatTime = (isoString) => {
                         <Loader2 v-if="isSearching" class="w-4 h-4 animate-spin" />
                         <Search v-else class="w-4 h-4" />
                       </button>
+                  </div>
+                  
+                  <!-- Autocomplete Dropdown -->
+                  <div v-if="showSuggestions && suggestions.length > 0" class="absolute top-full left-0 w-full mt-2 bg-midnight-950/95 border border-emerald-900/50 rounded-lg shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
+                    <ul>
+                      <li 
+                        v-for="(place, index) in suggestions" 
+                        :key|"index"
+                        @click="selectLocation(place)"
+                        class="px-4 py-3 hover:bg-emerald-900/30 cursor-pointer border-b border-white/5 last:border-none transition-colors group"
+                      >
+                        <div class="flex items-center gap-2">
+                           <MapPin class="w-3 h-3 text-emerald-500/50 group-hover:text-emerald-400" />
+                           <span class="text-emerald-100 font-wicca">{{ place.name }}</span>
+                        </div>
+                        <div class="text-xs text-emerald-200/40 pl-5 truncate">{{ place.display_name }}</div>
+                      </li>
+                    </ul>
                   </div>
               </div>
             </div>

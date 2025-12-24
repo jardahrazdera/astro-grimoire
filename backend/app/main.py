@@ -138,32 +138,38 @@ async def search_location(
     """
     try:
         geolocator = Nominatim(user_agent="astro_grimoire_app")
-        location = geolocator.geocode(q, language="en", addressdetails=True)
+        # Request more results to filter locally
+        locations = geolocator.geocode(q, language="en", addressdetails=True, exactly_one=False, limit=10)
 
-        if not location:
+        if not locations:
             return []
 
-        address = location.raw.get("address", {})
-        country = address.get("country")
-        state = address.get("state") or address.get("region")
-        
-        # Try to find a sensible "City" name
-        city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
-        
-        # Determine a short name
-        short_name = city if city else location.address.split(",")[0]
+        results = []
+        for location in locations:
+            address = location.raw.get("address", {})
+            country = address.get("country")
+            state = address.get("state") or address.get("region")
+            
+            # Try to find a sensible "City" name
+            city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
+            
+            # Determine a short name
+            short_name = city if city else location.address.split(",")[0]
 
-        return [
-            LocationResult(
-                name=short_name,
-                display_name=location.address,
-                lat=location.latitude,
-                lon=location.longitude,
-                country=country,
-                state=state,
-                city=city
-            )
-        ]
+            # Filter: strict prefix match on the name
+            if short_name.lower().startswith(q.lower()):
+                results.append(LocationResult(
+                    name=short_name,
+                    display_name=location.address,
+                    lat=location.latitude,
+                    lon=location.longitude,
+                    country=country,
+                    state=state,
+                    city=city
+                ))
+        
+        # Return top 5 filtered results
+        return results[:5]
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Geocoding error: {str(e)}")
