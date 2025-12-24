@@ -20,8 +20,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
-# We copy everything from backend/ context to /app
-COPY . .
+# We copy everything from backend/ context to /app/backend to preserve package structure
+COPY . backend/
 
 # Expose port 80
 EXPOSE 80
