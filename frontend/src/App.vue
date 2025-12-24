@@ -323,6 +323,27 @@ const formatTime = (isoString) => {
     <!-- Data Display -->
     <main v-if="astroData && !loading" class="z-10 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
 
+      <!-- Sun Cycle -->
+      <div class="glass-panel p-6 flex flex-col justify-between">
+        <h3 class="font-wicca text-xl text-amber-500/80 flex items-center gap-2 mb-4">
+          <Sun class="w-5 h-5" /> Sun Cycle
+        </h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center border-b border-white/5 pb-2">
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Sunrise</span>
+            <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.rise) }}</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-white/5 pb-2">
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Sunset</span>
+            <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.set) }}</span>
+          </div>
+           <div class="mt-4 text-xs text-center text-slate-500 italic">
+             {{ astroData.sun_times.is_always_up ? 'Sun is always up today' : '' }}
+             {{ astroData.sun_times.is_always_down ? 'Sun is always down today' : '' }}
+           </div>
+        </div>
+      </div>
+
       <!-- Moon Phase Card (Featured) -->
       <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-8 relative overflow-hidden group">
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -344,27 +365,6 @@ const formatTime = (isoString) => {
         <div class="relative">
             <p class="text-xl text-white font-serif tracking-wide">{{ astroData.moon_phase.phase_name }}</p>
             <p class="text-sm text-slate-400 mt-1">Age: {{ astroData.moon_phase.age_days }} days</p>
-        </div>
-      </div>
-
-      <!-- Sun Cycle -->
-      <div class="glass-panel p-6 flex flex-col justify-between">
-        <h3 class="font-wicca text-xl text-amber-500/80 flex items-center gap-2 mb-4">
-          <Sun class="w-5 h-5" /> Sun Cycle
-        </h3>
-        <div class="space-y-4">
-          <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Sunrise</span>
-            <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.rise) }}</span>
-          </div>
-          <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Sunset</span>
-            <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.set) }}</span>
-          </div>
-           <div class="mt-4 text-xs text-center text-slate-500 italic">
-             {{ astroData.sun_times.is_always_up ? 'Sun is always up today' : '' }}
-             {{ astroData.sun_times.is_always_down ? 'Sun is always down today' : '' }}
-           </div>
         </div>
       </div>
 
