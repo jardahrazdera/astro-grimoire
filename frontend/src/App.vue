@@ -25,6 +25,7 @@ const lon = ref(16.98);
 const date = ref(new Date().toISOString().split('T')[0]);
 const isSearching = ref(false);
 const showCoords = ref(false);
+const locationDetails = ref(null);
 
 // --- API Calls ---
 
@@ -32,6 +33,7 @@ const searchLocation = async () => {
   if (!searchQuery.value) return;
   isSearching.value = true;
   error.value = null;
+  locationDetails.value = null;
   
   try {
     const response = await axios.get('http://localhost:8000/search-location', {
@@ -42,6 +44,7 @@ const searchLocation = async () => {
       const loc = response.data[0];
       lat.value = loc.lat;
       lon.value = loc.lon;
+      locationDetails.value = loc;
       // Trigger astro data fetch immediately after finding location
       await fetchData();
     } else {
@@ -147,6 +150,25 @@ const formatTime = (isoString) => {
                 <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
                 <span v-else>Consult Stars</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- Realm Details (Location Info) -->
+        <div v-if="locationDetails" class="border-t border-emerald-900/30 pt-4 mt-2 animate-fade-in">
+            <div class="flex items-start gap-3 text-emerald-100/80">
+                <MapPin class="w-5 h-5 text-mystic-gold mt-1 shrink-0" />
+                <div>
+                    <h3 class="font-wicca text-xl text-mystic-gold leading-none mb-1">{{ locationDetails.name }}</h3>
+                    <p class="text-xs text-emerald-200/60 font-mono mb-2">{{ locationDetails.display_name }}</p>
+                    <div class="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider">
+                        <span v-if="locationDetails.country" class="px-2 py-0.5 rounded bg-emerald-900/40 text-emerald-300 border border-emerald-800/50">
+                            {{ locationDetails.country }}
+                        </span>
+                         <span v-if="locationDetails.state" class="px-2 py-0.5 rounded bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                            {{ locationDetails.state }}
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 

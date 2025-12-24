@@ -45,9 +45,12 @@ app.add_middleware(
 
 class LocationResult(BaseModel):
     name: str
+    display_name: str
     lat: float
     lon: float
     country: Optional[str] = None
+    state: Optional[str] = None
+    city: Optional[str] = None
 
 
 class SolsticeData(BaseModel):
@@ -131,7 +134,7 @@ async def search_location(
     q: str = Query(..., description="City or place name to search for (e.g. 'Prague')")
 ):
     """
-    Search for a location by name and return coordinates.
+    Search for a location by name and return coordinates with details.
     """
     try:
         geolocator = Nominatim(user_agent="astro_grimoire_app")
@@ -140,18 +143,25 @@ async def search_location(
         if not location:
             return []
 
-        # We return a list to support future multiple results, but currently just one for simplicity
-        # or we could use geolocator.geocode(exactly_one=False) for multiple
-        # Let's keep it simple: top result.
+        address = location.raw.get("address", {})
+        country = address.get("country")
+        state = address.get("state") or address.get("region")
         
-        country = location.raw.get("address", {}).get("country")
+        # Try to find a sensible "City" name
+        city = address.get("city") or address.get("town") or address.get("village") or address.get("hamlet")
+        
+        # Determine a short name
+        short_name = city if city else location.address.split(",")[0]
 
         return [
             LocationResult(
-                name=location.address,
+                name=short_name,
+                display_name=location.address,
                 lat=location.latitude,
                 lon=location.longitude,
-                country=country
+                country=country,
+                state=state,
+                city=city
             )
         ]
 
