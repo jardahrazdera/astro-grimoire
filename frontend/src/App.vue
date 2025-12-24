@@ -241,7 +241,7 @@ const formatTime = (isoString) => {
                   </div>
                   
                   <!-- Autocomplete Dropdown -->
-                  <div v-if="showSuggestions && suggestions.length > 0" class="absolute top-full left-0 w-full mt-2 bg-midnight-950/95 border border-emerald-900/50 rounded-lg shadow-2xl z-50 overflow-hidden backdrop-blur-xl">
+                  <div v-if="showSuggestions && suggestions.length > 0" class="absolute top-full left-0 w-full mt-2 bg-midnight-950/95 border border-emerald-900/50 rounded-lg shadow-2xl z-50 overflow-y-auto max-h-[300px] backdrop-blur-xl">
                     <ul>
                       <li 
                         v-for="(place, index) in suggestions" 
