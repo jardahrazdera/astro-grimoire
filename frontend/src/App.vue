@@ -108,7 +108,7 @@ const formatTime = (isoString) => {
     </header>
 
     <!-- Controls / Input -->
-    <section class="z-10 w-full max-w-4xl mb-12">
+    <section class="z-10 w-full max-w-5xl mb-12">
       <div class="glass-panel p-6 flex flex-col gap-6">
         
         <div class="flex flex-col md:flex-row gap-4">
