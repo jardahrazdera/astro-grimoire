@@ -26,14 +26,14 @@ services:
     #   - "traefik.http.routers.astro-backend.tls.certresolver=myresolver"
     #   - "traefik.http.services.astro-backend.loadbalancer.server.port=80"
 
-  # Frontend placeholder - we will configure this later when Vue setup is ready
-  # frontend:
-  #   build: ./frontend
-  #   container_name: astro-frontend
-  #   ports:
-  #     - "5173:5173"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   environment:
-  #     - VITE_API_URL=http://backend:80
+  frontend:
+    build: ./frontend
+    container_name: astro-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://backend:80
+    restart: unless-stopped
