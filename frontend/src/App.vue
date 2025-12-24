@@ -243,8 +243,8 @@ const formatTime = (isoString) => {
         </div>
         <div class="h-px w-20 bg-emerald-900 md:h-10 md:w-px"></div>
         <div class="text-center">
-             <div class="text-xs uppercase tracking-widest text-indigo-400 mb-1">Hemisphere</div>
-             <div class="font-mono text-sm text-slate-300">{{ astroData.solstices_current_year.hemisphere }}</div>
+             <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">Hemisphere</div>
+             <div class="font-wicca text-xl text-mystic-silver">{{ astroData.solstices_current_year.hemisphere }}</div>
         </div>
         <div class="h-px w-20 bg-emerald-900 md:h-10 md:w-px"></div>
         <div class="text-center">
