@@ -421,8 +421,35 @@ const formatTime = (isoString) => {
         </div>
       </div>
 
-      <!-- Moon Phase Card (Featured) -->
-      <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col items-center justify-between p-6 relative overflow-hidden group">
+      <!-- Moon Cycle Card (Featured) -->
+      <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col justify-between p-6 relative overflow-hidden group">
+        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
+          Moon Cycle
+        </h3>
+
+        <!-- Center Visual -->
+        <div class="flex-1 flex items-center justify-center py-4 relative z-10">
+           <img :src="moonSvg" alt="Moon Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(165,180,252,0.4)] animate-float" />
+        </div>
+
+        <div class="space-y-4 relative z-10">
+          <div class="flex justify-between items-center border-b border-white/5 pb-2">
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Moonrise</span>
+            <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.rise) }}</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-white/5 pb-2">
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Moonset</span>
+            <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.set) }}</span>
+          </div>
+          <div class="mt-4 text-xs text-center text-slate-500 italic">
+             {{ astroData.moon_times.is_always_up ? 'Moon is always up today' : '' }}
+             {{ astroData.moon_times.is_always_down ? 'Moon is always down today' : '' }}
+           </div>
+        </div>
+      </div>
+
+      <!-- Moon Phase -->
+      <div class="glass-panel p-6 flex flex-col items-center justify-between relative overflow-hidden group">
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
         
         <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
@@ -448,33 +475,6 @@ const formatTime = (isoString) => {
         <div class="relative z-10 text-center">
             <p class="text-xl text-white font-serif tracking-wide">{{ astroData.moon_phase.phase_name }}</p>
             <p class="text-sm text-slate-400 mt-1">Age: {{ astroData.moon_phase.age_days }} days</p>
-        </div>
-      </div>
-
-      <!-- Moon Cycle -->
-      <div class="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
-        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
-          Moon Cycle
-        </h3>
-
-        <!-- Center Visual -->
-        <div class="flex-1 flex items-center justify-center py-4 relative z-10">
-           <img :src="moonSvg" alt="Moon Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(165,180,252,0.4)] animate-float" />
-        </div>
-
-        <div class="space-y-4 relative z-10">
-          <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Moonrise</span>
-            <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.rise) }}</span>
-          </div>
-          <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Moonset</span>
-            <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.set) }}</span>
-          </div>
-          <div class="mt-4 text-xs text-center text-slate-500 italic">
-             {{ astroData.moon_times.is_always_up ? 'Moon is always up today' : '' }}
-             {{ astroData.moon_times.is_always_down ? 'Moon is always down today' : '' }}
-           </div>
         </div>
       </div>
 
