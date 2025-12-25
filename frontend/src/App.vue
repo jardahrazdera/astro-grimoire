@@ -14,6 +14,7 @@ import {
   Crosshair
 } from 'lucide-vue-next';
 import MoonPhase from './components/MoonPhase.vue';
+import CosmicClock from './components/CosmicClock.vue';
 
 // --- State ---
 const loading = ref(false);
@@ -199,12 +200,17 @@ const formatTime = (isoString) => {
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
     <!-- Header -->
-    <header class="z-10 text-center mb-10 mt-4">
+    <header class="z-10 text-center mb-6 mt-4">
       <h1 class="font-wicca text-4xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-mystic-silver via-amber-100 to-mystic-silver drop-shadow-[0_0_10px_rgba(252,211,77,0.3)] mb-2">
         Astro Grimoire
       </h1>
       <p class="text-emerald-200/60 tracking-[0.2em] text-sm uppercase">Celestial Ephemeris & Lunation</p>
     </header>
+
+    <!-- Cosmic Clock (Real-time) -->
+    <section class="z-10 mb-8">
+        <CosmicClock />
+    </section>
 
     <!-- Controls / Input -->
     <section class="z-20 w-full max-w-5xl mb-12">
