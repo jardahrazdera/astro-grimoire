@@ -227,8 +227,11 @@ const toggleLocale = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-midnight-950 bg-star-pattern text-mystic-silver font-sans selection:bg-emerald-900 selection:text-amber-100 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden">
+  <div class="min-h-screen text-mystic-silver font-sans selection:bg-emerald-900 selection:text-amber-100 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden">
     
+    <!-- Base Background Color & Star Pattern -->
+    <div class="fixed inset-0 bg-midnight-950 bg-star-pattern z-[-10]"></div>
+
     <!-- Language Switcher -->
     <div class="z-50 mb-8 mt-2">
       <button @click="toggleLocale" class="glass-panel px-4 py-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-emerald-400 transition-all hover:scale-105 active:scale-95">
@@ -239,7 +242,7 @@ const toggleLocale = () => {
 
     <!-- Mystical Background Texture -->
     <div 
-      class="fixed inset-0 z-[-1] opacity-10 pointer-events-none transition-transform duration-[2000ms] ease-out"
+      class="fixed inset-0 z-[-5] opacity-10 pointer-events-none transition-transform duration-[2000ms] ease-out"
       :style="{ 
         backgroundImage: `url(${bgImage})`, 
         backgroundRepeat: 'repeat',
@@ -249,11 +252,11 @@ const toggleLocale = () => {
     ></div>
 
     <!-- Ambient Background Glow -->
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full pointer-events-none z-[-1]"></div>
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/10 blur-[120px] rounded-full pointer-events-none z-[-4]"></div>
 
     <!-- Mouse Cursor Aura -->
     <div 
-      class="fixed pointer-events-none z-[-1] mix-blend-screen transition-transform duration-[500ms] ease-out will-change-transform"
+      class="fixed pointer-events-none z-[-3] mix-blend-screen transition-transform duration-[500ms] ease-out will-change-transform"
       :style="{
         left: 0,
         top: 0,
