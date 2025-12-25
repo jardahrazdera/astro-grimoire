@@ -230,39 +230,15 @@ const toggleLocale = () => {
   <div class="min-h-screen bg-midnight-950 bg-star-pattern text-mystic-silver font-sans selection:bg-emerald-900 selection:text-amber-100 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden">
     
     <!-- Language Switcher -->
-    <div class="fixed top-4 right-4 z-50">
-      <button @click="toggleLocale" class="glass-panel px-3 py-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-tighter hover:text-emerald-400 transition-colors">
-        <Languages class="w-4 h-4" />
+    <div class="z-50 mb-8 mt-2">
+      <button @click="toggleLocale" class="glass-panel px-4 py-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest hover:text-emerald-400 transition-all hover:scale-105 active:scale-95">
+        <Languages class="w-4 h-4 text-emerald-500" />
         {{ locale === 'en' ? 'Čeština' : 'English' }}
       </button>
     </div>
 
-    <!-- Mystical Background Texture -->
-    <div 
-      class="fixed inset-0 z-0 opacity-10 pointer-events-none transition-transform duration-[2000ms] ease-out"
-      :style="{ 
-        backgroundImage: `url(${bgImage})`, 
-        backgroundRepeat: 'repeat',
-        backgroundSize: 'auto',
-        transform: `translate(${mouseX * 30}px, ${mouseY * 30}px) scale(1.1)` 
-      }"
-    ></div>
-
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
-
-    <div 
-      class="fixed pointer-events-none z-0 mix-blend-screen transition-transform duration-[500ms] ease-out will-change-transform"
-      :style="{
-        left: 0,
-        top: 0,
-        width: '800px',
-        height: '800px',
-        transform: `translate(${cursorX - 400}px, ${cursorY - 400}px)`,
-        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 70%)',
-      }"
-    ></div>
-
-    <header class="z-10 text-center mb-6 mt-4">
+    <!-- Header -->
+    <header class="z-10 text-center mb-6">
       <h1 class="font-wicca text-4xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-mystic-silver via-amber-100 to-mystic-silver drop-shadow-[0_0_10px_rgba(252,211,77,0.3)] mb-2">
         {{ t('title') }}
       </h1>
