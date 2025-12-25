@@ -71,6 +71,8 @@ let debounceTimeout = null;
 
 // --- API Calls ---
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const fetchSuggestions = async () => {
   if (!searchQuery.value || searchQuery.value.length < 3) {
     suggestions.value = [];
@@ -78,7 +80,7 @@ const fetchSuggestions = async () => {
   }
   
   try {
-    const response = await axios.get('http://localhost:8000/search-location', {
+    const response = await axios.get(`${API_BASE_URL}/search-location`, {
       params: { q: searchQuery.value }
     });
     suggestions.value = response.data || [];
@@ -125,7 +127,7 @@ const searchLocation = async () => {
   showSuggestions.value = false; // Hide dropdown on manual search
   
   try {
-    const response = await axios.get('http://localhost:8000/search-location', {
+    const response = await axios.get(`${API_BASE_URL}/search-location`, {
       params: { q: searchQuery.value }
     });
     
@@ -164,7 +166,7 @@ const getUserLocation = () => {
         const userLon = position.coords.longitude;
         
         // Reverse Geocode
-        const response = await axios.get('http://localhost:8000/reverse-geocode', {
+        const response = await axios.get(`${API_BASE_URL}/reverse-geocode`, {
           params: { lat: userLat, lon: userLon }
         });
         
@@ -196,7 +198,7 @@ const fetchData = async () => {
   astroData.value = null;
 
   try {
-    const response = await axios.get('http://localhost:8000/astro-data', {
+    const response = await axios.get(`${API_BASE_URL}/astro-data`, {
       params: {
         lat: lat.value,
         lon: lon.value,
