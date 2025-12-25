@@ -16,6 +16,8 @@ import {
 import MoonPhase from './components/MoonPhase.vue';
 import CosmicClock from './components/CosmicClock.vue';
 import bgImage from './assets/background.webp';
+import sunSvg from './assets/sun.svg';
+import moonSvg from './assets/moon.svg';
 
 // --- State ---
 const loading = ref(false);
@@ -393,11 +395,17 @@ const formatTime = (isoString) => {
     <main v-if="astroData && !loading" class="z-10 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
 
       <!-- Sun Cycle -->
-      <div class="glass-panel p-6 flex flex-col justify-between">
-        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-6 relative">
+      <div class="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
+        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
           Sun Cycle
         </h3>
-        <div class="space-y-4">
+        
+        <!-- Center Visual -->
+        <div class="flex-1 flex items-center justify-center py-4 relative z-10">
+           <img :src="sunSvg" alt="Sun Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)] animate-pulse-slow" />
+        </div>
+
+        <div class="space-y-4 relative z-10">
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
             <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Sunrise</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.rise) }}</span>
@@ -440,11 +448,17 @@ const formatTime = (isoString) => {
       </div>
 
       <!-- Moon Cycle -->
-      <div class="glass-panel p-6 flex flex-col justify-between">
-        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-6 relative">
+      <div class="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
+        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
           Moon Cycle
         </h3>
-        <div class="space-y-4">
+
+        <!-- Center Visual -->
+        <div class="flex-1 flex items-center justify-center py-4 relative z-10">
+           <img :src="moonSvg" alt="Moon Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(165,180,252,0.4)] animate-float" />
+        </div>
+
+        <div class="space-y-4 relative z-10">
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
             <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Moonrise</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.rise) }}</span>
@@ -524,5 +538,23 @@ const formatDate = (iso) => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 </style>
