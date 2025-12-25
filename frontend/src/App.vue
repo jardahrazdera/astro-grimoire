@@ -25,11 +25,17 @@ const astroData = ref(null);
 // Parallax State
 const mouseX = ref(0);
 const mouseY = ref(0);
+const cursorX = ref(0);
+const cursorY = ref(0);
 
 const handleMouseMove = (event) => {
   // Normalize coordinates from center of screen (-1 to 1)
   mouseX.value = (event.clientX / window.innerWidth) * 2 - 1;
   mouseY.value = (event.clientY / window.innerHeight) * 2 - 1;
+  
+  // Raw coordinates for cursor aura
+  cursorX.value = event.clientX;
+  cursorY.value = event.clientY;
 };
 
 // Form Inputs
@@ -225,6 +231,19 @@ const formatTime = (isoString) => {
 
     <!-- Ambient Background Glow -->
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <!-- Mouse Cursor Aura -->
+    <div 
+      class="fixed pointer-events-none z-0 mix-blend-screen transition-transform duration-[500ms] ease-out will-change-transform"
+      :style="{
+        left: 0,
+        top: 0,
+        width: '800px',
+        height: '800px',
+        transform: `translate(${cursorX - 400}px, ${cursorY - 400}px)`,
+        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 70%)',
+      }"
+    ></div>
 
     <!-- Header -->
     <header class="z-10 text-center mb-6 mt-4">
