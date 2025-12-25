@@ -45,6 +45,19 @@
     "Northern": "Northern",
     "Southern": "Southern"
   },
+  "clock": {
+    "the_of": "{day}, the {num} of {month}",
+    "phases": {
+      "silent_watch": "The Silent Watch",
+      "before_dawn": "Before the Dawn",
+      "morning_ascent": "Morning's Ascent",
+      "suns_zenith": "Sun's Zenith",
+      "suns_dominion": "Sun's Dominion",
+      "evenings_embrace": "Evening's Embrace",
+      "twilights_deep": "Twilight's Deep",
+      "nights_depth": "Night's Depth"
+    }
+  },
   "ui": {
     "loading": "Consulting the heavens...",
     "error_prefix": "An omen of error:",

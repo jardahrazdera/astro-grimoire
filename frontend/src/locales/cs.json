@@ -45,6 +45,19 @@
     "Northern": "Severní",
     "Southern": "Jižní"
   },
+  "clock": {
+    "the_of": "{day}, {num}. {month}",
+    "phases": {
+      "silent_watch": "Tichá hlídka",
+      "before_dawn": "Před úsvitem",
+      "morning_ascent": "Ranní vzestup",
+      "suns_zenith": "Sluneční zenit",
+      "suns_dominion": "Vláda slunce",
+      "evenings_embrace": "Náruč večera",
+      "twilights_deep": "Hluboký soumrak",
+      "nights_depth": "Hlubina noci"
+    }
+  },
   "ui": {
     "loading": "Naslouchám nebesům...",
     "error_prefix": "Znamení chyby:",
