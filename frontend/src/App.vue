@@ -431,7 +431,7 @@ const formatTime = (isoString) => {
         
         <!-- Simplified Moon Representation -->
         <div class="flex-1 flex items-center justify-center py-4 relative z-10">
-             <div class="relative w-32 h-32 rounded-full shadow-[0_0_50px_rgba(255,255,255,0.1)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
+             <div class="relative w-40 h-40 rounded-full shadow-[0_0_50px_rgba(255,220,164,0.15)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
                  <MoonPhase 
                     :percent="astroData.moon_phase.illumination_percent" 
                     :phase="astroData.moon_phase.phase_name"
