@@ -229,10 +229,13 @@ onUnmounted(() => {
 });
 
 // --- Formatters ---
-const formatTime = (isoString) => {
-  if (!isoString) return '--:--';
-  const d = new Date(isoString);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const formatTime = (iso) => {
+  if (!iso) return "--:--";
+  return new Date(iso).toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
 };
 </script>
 
@@ -508,7 +511,11 @@ const formatTime = (isoString) => {
 // Defining helpers in setup for cleaner template usage.
 const format_ephem_date = (iso) => {
     if (!iso) return '--:--';
-    return new Date(iso).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    return new Date(iso).toLocaleTimeString([], {
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false
+    });
 }
 const formatDate = (iso) => {
     if (!iso) return '---';
