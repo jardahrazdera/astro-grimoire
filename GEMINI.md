@@ -53,8 +53,16 @@ docker-compose up --build
 *   `docker-compose.yml`: Orchestrates the backend and frontend services.
 *   `backend/app/main.py`: Main entry point for the FastAPI application. Contains all API routes and core astronomy logic.
 *   `backend/requirements.txt`: Python dependencies.
-*   `frontend/src/App.vue`: Main Vue component containing the UI layout and state logic.
+*   `frontend/src/App.vue`: Main Vue component containing the UI layout, state logic, and mystical effects.
+*   `frontend/src/assets/background.webp`: Tiled mystical background texture.
 *   `frontend/vite.config.js`: Vite configuration for the frontend build.
+
+## Mystical UI Features
+The application includes several visual effects to enhance the "Wicca" aesthetic:
+*   **Tiled Background:** A subtle, low-opacity mystical texture that covers the entire viewport.
+*   **Mouse Parallax:** The background shifts gracefully in response to mouse movements (Desktop).
+*   **Cursor Aura:** A trailing, glowing emerald aura that follows the mouse cursor with a smooth lag.
+*   **Mobile Parallax:** On devices with motion sensors, the background shifts based on the phone's tilt (Gyroscope).
 
 ## Development Conventions
 *   **Backend:**
