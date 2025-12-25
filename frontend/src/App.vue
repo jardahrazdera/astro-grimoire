@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import axios from 'axios';
 import { 
   Moon, 
@@ -11,13 +12,16 @@ import {
   ArrowUp,
   ArrowDown,
   Search,
-  Crosshair
+  Crosshair,
+  Languages
 } from 'lucide-vue-next';
 import MoonPhase from './components/MoonPhase.vue';
 import CosmicClock from './components/CosmicClock.vue';
 import bgImage from './assets/background.webp';
 import sunSvg from './assets/sun.svg';
 import moonSvg from './assets/moon.svg';
+
+const { t, locale } = useI18n();
 
 // --- State ---
 const loading = ref(false);
@@ -31,26 +35,16 @@ const cursorX = ref(0);
 const cursorY = ref(0);
 
 const handleMouseMove = (event) => {
-  // Normalize coordinates from center of screen (-1 to 1)
   mouseX.value = (event.clientX / window.innerWidth) * 2 - 1;
   mouseY.value = (event.clientY / window.innerHeight) * 2 - 1;
-  
-  // Raw coordinates for cursor aura
   cursorX.value = event.clientX;
   cursorY.value = event.clientY;
 };
 
 const handleDeviceOrientation = (event) => {
   if (!event.gamma || !event.beta) return;
-
-  // Gamma: Left/Right tilt (-90 to 90). 
-  // We clamp to -45 to 45 for a -1 to 1 range.
   const tiltX = Math.max(-45, Math.min(45, event.gamma));
   mouseX.value = tiltX / 45;
-
-  // Beta: Front/Back tilt (-180 to 180). 
-  // Users typically hold phone at 45 degrees. 
-  // We map 0 to 90 (resting range) to -1 to 1.
   const tiltY = Math.max(0, Math.min(90, event.beta));
   mouseY.value = (tiltY - 45) / 45; 
 };
@@ -70,7 +64,6 @@ const showSuggestions = ref(false);
 let debounceTimeout = null;
 
 // --- API Calls ---
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const fetchSuggestions = async () => {
@@ -81,7 +74,8 @@ const fetchSuggestions = async () => {
   
   try {
     const response = await axios.get(`${API_BASE_URL}/search-location`, {
-      params: { q: searchQuery.value }
+      params: { q: searchQuery.value },
+      headers: { 'Accept-Language': locale.value }
     });
     suggestions.value = response.data || [];
     showSuggestions.value = true;
@@ -101,34 +95,26 @@ const selectLocation = async (loc) => {
   await fetchData();
 };
 
-// Watch input for autocomplete
 watch(searchQuery, (newVal) => {
   if (debounceTimeout) clearTimeout(debounceTimeout);
-  
-  // If we just selected a location (and update the query), don't re-search immediately
-  // A simple check is if the new value matches the current selected location name, but 
-  // users might edit it. For now, just debounce.
-  
   debounceTimeout = setTimeout(() => {
     if (newVal && (!locationDetails.value || newVal !== locationDetails.value.name)) {
         fetchSuggestions();
     }
-  }, 500); // 500ms debounce
+  }, 500);
 });
 
 const searchLocation = async () => {
-  // If we have suggestions and the user hits enter, maybe pick the first one?
-  // Or just do a hard search. Let's do a hard search which is effectively the same 
-  // as the current logic but using the first result.
   if (!searchQuery.value) return;
   isSearching.value = true;
   error.value = null;
   locationDetails.value = null;
-  showSuggestions.value = false; // Hide dropdown on manual search
+  showSuggestions.value = false;
   
   try {
     const response = await axios.get(`${API_BASE_URL}/search-location`, {
-      params: { q: searchQuery.value }
+      params: { q: searchQuery.value },
+      headers: { 'Accept-Language': locale.value }
     });
     
     if (response.data && response.data.length > 0) {
@@ -136,13 +122,12 @@ const searchLocation = async () => {
       lat.value = loc.lat;
       lon.value = loc.lon;
       locationDetails.value = loc;
-      // Trigger astro data fetch immediately after finding location
       await fetchData();
     } else {
-      error.value = "Location not found in the star charts.";
+      error.value = t('search.no_location');
     }
   } catch (err) {
-    error.value = "Could not consult the cartographer (Geocoding Error)";
+    error.value = t('search.error');
     console.error(err);
   } finally {
     isSearching.value = false;
@@ -151,7 +136,7 @@ const searchLocation = async () => {
 
 const getUserLocation = () => {
   if (!navigator.geolocation) {
-    error.value = "Your browser does not support celestial positioning.";
+    error.value = t('ui.error_prefix') + " Geolocation not supported";
     return;
   }
   
@@ -165,9 +150,9 @@ const getUserLocation = () => {
         const userLat = position.coords.latitude;
         const userLon = position.coords.longitude;
         
-        // Reverse Geocode
         const response = await axios.get(`${API_BASE_URL}/reverse-geocode`, {
-          params: { lat: userLat, lon: userLon }
+          params: { lat: userLat, lon: userLon },
+          headers: { 'Accept-Language': locale.value }
         });
         
         const loc = response.data;
@@ -178,16 +163,15 @@ const getUserLocation = () => {
         
         await fetchData();
       } catch (err) {
-         error.value = "Could not identify your realm from the stars.";
+         error.value = t('ui.error_prefix') + " Geocode error";
          console.error(err);
       } finally {
         isSearching.value = false;
       }
     },
     (err) => {
-      error.value = "Permission to view your realm was denied.";
+      error.value = t('ui.error_prefix') + " Permission denied";
       isSearching.value = false;
-      console.error(err);
     }
   );
 };
@@ -207,20 +191,16 @@ const fetchData = async () => {
     });
     astroData.value = response.data;
   } catch (err) {
-    error.value = "The stars remain silent... (Connection Error)";
+    error.value = t('ui.error_prefix') + " Connection error";
     console.error(err);
   } finally {
     loading.value = false;
   }
 };
 
-// Initial fetch
 onMounted(() => {
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('deviceorientation', handleDeviceOrientation);
-  if (lat.value && lon.value) {
-    fetchData();
-  }
 });
 
 onUnmounted(() => {
@@ -228,20 +208,35 @@ onUnmounted(() => {
   window.removeEventListener('deviceorientation', handleDeviceOrientation);
 });
 
-// --- Formatters ---
-const formatTime = (iso) => {
-  if (!iso) return "--:--";
-  return new Date(iso).toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    hour12: false 
-  });
+const format_ephem_date = (iso) => {
+    if (!iso) return '--:--';
+    return new Date(iso).toLocaleTimeString([], {
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false
+    });
+}
+const formatDate = (iso) => {
+    if (!iso) return '---';
+    return new Date(iso).toLocaleDateString(locale.value === 'cs' ? 'cs-CZ' : 'en-US', { month: 'long', day: 'numeric' });
+}
+
+const toggleLocale = () => {
+  locale.value = locale.value === 'en' ? 'cs' : 'en';
 };
 </script>
 
 <template>
   <div class="min-h-screen bg-midnight-950 bg-star-pattern text-mystic-silver font-sans selection:bg-emerald-900 selection:text-amber-100 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden">
     
+    <!-- Language Switcher -->
+    <div class="fixed top-4 right-4 z-50">
+      <button @click="toggleLocale" class="glass-panel px-3 py-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-tighter hover:text-emerald-400 transition-colors">
+        <Languages class="w-4 h-4" />
+        {{ locale === 'en' ? 'Čeština' : 'English' }}
+      </button>
+    </div>
+
     <!-- Mystical Background Texture -->
     <div 
       class="fixed inset-0 z-0 opacity-10 pointer-events-none transition-transform duration-[2000ms] ease-out"
@@ -253,10 +248,8 @@ const formatTime = (iso) => {
       }"
     ></div>
 
-    <!-- Ambient Background Glow -->
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-    <!-- Mouse Cursor Aura -->
     <div 
       class="fixed pointer-events-none z-0 mix-blend-screen transition-transform duration-[500ms] ease-out will-change-transform"
       :style="{
@@ -269,27 +262,23 @@ const formatTime = (iso) => {
       }"
     ></div>
 
-    <!-- Header -->
     <header class="z-10 text-center mb-6 mt-4">
       <h1 class="font-wicca text-4xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-mystic-silver via-amber-100 to-mystic-silver drop-shadow-[0_0_10px_rgba(252,211,77,0.3)] mb-2">
-        Astro Grimoire
+        {{ t('title') }}
       </h1>
       <p class="text-emerald-200/60 tracking-[0.2em] text-sm uppercase">Celestial Ephemeris & Lunation</p>
     </header>
 
-    <!-- Cosmic Clock (Real-time) -->
     <section class="z-10 mb-8">
         <CosmicClock />
     </section>
 
-    <!-- Controls / Input -->
     <section class="z-20 w-full max-w-5xl mb-12">
       <div class="glass-panel p-6 flex flex-col gap-6">
         
         <div class="flex flex-col md:flex-row gap-4">
-            <!-- Search Bar -->
             <div class="flex-1 relative group">
-              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Location</label>
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Realm</label>
               <div class="relative flex items-center">
                   <MapPin class="absolute left-3 text-emerald-500 w-4 h-4" />
                   <input 
@@ -297,7 +286,7 @@ const formatTime = (iso) => {
                     @keyup.enter="searchLocation"
                     type="text" 
                     class="input-field pl-10 pr-20" 
-                    placeholder="Enter city (e.g. Prague, Salem)" 
+                    :placeholder="t('search.placeholder')" 
                   />
                   <div class="absolute right-2 flex items-center gap-1">
                       <button 
@@ -319,7 +308,6 @@ const formatTime = (iso) => {
                       </button>
                   </div>
                   
-                  <!-- Autocomplete Dropdown -->
                   <div v-if="showSuggestions && suggestions.length > 0" class="absolute top-full left-0 w-full mt-2 bg-midnight-950/95 border border-emerald-900/50 rounded-lg shadow-2xl z-50 overflow-y-auto max-h-[300px] backdrop-blur-xl">
                     <ul>
                       <li 
@@ -339,16 +327,14 @@ const formatTime = (iso) => {
               </div>
             </div>
 
-            <!-- Date Picker -->
             <div class="w-full md:w-auto md:min-w-[200px]">
-              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Date</label>
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Era</label>
               <div class="relative">
                 <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
                 <input v-model="date" type="date" class="input-field pl-10" />
               </div>
             </div>
 
-             <!-- Main Action -->
             <div class="flex items-end">
                 <button @click="fetchData" :disabled="loading || !lat || !lon" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 h-[42px]">
                 <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
@@ -357,31 +343,20 @@ const formatTime = (iso) => {
             </div>
         </div>
 
-        <!-- Realm Details (Location Info) -->
         <div v-if="locationDetails" class="border-t border-emerald-900/30 pt-4 mt-2 animate-fade-in">
             <div class="flex items-start gap-3 text-emerald-100/80">
                 <MapPin class="w-5 h-5 text-mystic-gold mt-1 shrink-0" />
                 <div>
                     <h3 class="font-wicca text-xl text-mystic-gold leading-none mb-1">{{ locationDetails.name }}</h3>
                     <p class="text-xs text-emerald-200/60 font-mono mb-2">{{ locationDetails.display_name }}</p>
-                    <div class="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider">
-                        <span v-if="locationDetails.country" class="px-2 py-0.5 rounded bg-emerald-900/40 text-emerald-300 border border-emerald-800/50">
-                            {{ locationDetails.country }}
-                        </span>
-                         <span v-if="locationDetails.state" class="px-2 py-0.5 rounded bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                            {{ locationDetails.state }}
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Coordinates Toggle -->
         <div class="text-xs text-center">
             <button @click="showCoords = !showCoords" class="text-emerald-500/50 hover:text-emerald-400 underline decoration-dotted">
                 {{ showCoords ? 'Hide Coordinates' : 'Show Coordinates' }}
             </button>
-            
             <div v-if="showCoords" class="mt-2 flex justify-center gap-4 text-emerald-100/40 font-mono transition-all">
                 <span>Lat: {{ lat }}</span>
                 <span>Lon: {{ lon }}</span>
@@ -391,79 +366,59 @@ const formatTime = (iso) => {
       </div>
     </section>
 
-    <!-- Error State -->
     <div v-if="error" class="z-10 text-rose-300 bg-rose-950/30 border border-rose-900/50 p-4 rounded-lg backdrop-blur-sm mb-8">
       {{ error }}
     </div>
 
-    <!-- Data Display -->
     <main v-if="astroData && !loading" class="z-10 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
 
       <!-- Sun Cycle -->
       <div class="glass-panel p-6 flex flex-col justify-between relative overflow-hidden group">
         <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
-          Sun Cycle
+          {{ t('sections.sun_cycle') }}
         </h3>
-        
-        <!-- Center Visual -->
         <div class="flex-1 flex items-center justify-center py-4 relative z-10">
            <img :src="sunSvg" alt="Sun Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)] animate-pulse-slow" />
         </div>
-
         <div class="space-y-4 relative z-10">
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Sunrise</span>
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> {{ t('data.sunrise') }}</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.rise) }}</span>
           </div>
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Sunset</span>
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> {{ t('data.sunset') }}</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.sun_times.set) }}</span>
           </div>
-           <div class="mt-4 text-xs text-center text-slate-500 italic">
-             {{ astroData.sun_times.is_always_up ? 'Sun is always up today' : '' }}
-             {{ astroData.sun_times.is_always_down ? 'Sun is always down today' : '' }}
-           </div>
         </div>
       </div>
 
-      <!-- Moon Cycle Card (Featured) -->
-      <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col justify-between p-6 relative overflow-hidden group">
+      <!-- Moon Cycle -->
+      <div class="glass-panel flex flex-col justify-between p-6 relative overflow-hidden group">
         <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
-          Moon Cycle
+          {{ t('sections.moon_cycle') }}
         </h3>
-
-        <!-- Center Visual -->
         <div class="flex-1 flex items-center justify-center py-4 relative z-10">
            <img :src="moonSvg" alt="Moon Symbol" class="w-36 h-36 opacity-90 drop-shadow-[0_0_15px_rgba(165,180,252,0.4)] animate-float" />
         </div>
-
         <div class="space-y-4 relative z-10">
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> Moonrise</span>
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowUp class="w-4 h-4"/> {{ t('data.moonrise') }}</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.rise) }}</span>
           </div>
           <div class="flex justify-between items-center border-b border-white/5 pb-2">
-            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> Moonset</span>
+            <span class="text-emerald-100/60 flex items-center gap-2"><ArrowDown class="w-4 h-4"/> {{ t('data.moonset') }}</span>
             <span class="font-mono text-lg">{{ format_ephem_date(astroData.moon_times.set) }}</span>
           </div>
-          <div class="mt-4 text-xs text-center text-slate-500 italic">
-             {{ astroData.moon_times.is_always_up ? 'Moon is always up today' : '' }}
-             {{ astroData.moon_times.is_always_down ? 'Moon is always down today' : '' }}
-           </div>
         </div>
       </div>
 
       <!-- Moon Phase -->
       <div class="glass-panel p-6 flex flex-col items-center justify-between relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        
         <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
-          Current Phase
+          {{ t('sections.moon_phase') }}
         </h3>
-        
-        <!-- Simplified Moon Representation -->
         <div class="flex-1 flex items-center justify-center py-4 relative z-10">
-             <div class="relative w-40 h-40 rounded-full shadow-[0_0_50px_rgba(255,220,164,0.15)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
+             <div class="relative w-40 h-40 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
                  <MoonPhase 
                     :percent="astroData.moon_phase.illumination_percent" 
                     :phase="astroData.moon_phase.phase_name"
@@ -476,14 +431,13 @@ const formatTime = (iso) => {
                  </div>
             </div>
         </div>
-
         <div class="relative z-10 text-center">
             <p class="text-xl text-white font-serif tracking-wide">{{ astroData.moon_phase.phase_name }}</p>
-            <p class="text-sm text-slate-400 mt-1">Age: {{ astroData.moon_phase.age_days }} days</p>
+            <p class="text-sm text-slate-400 mt-1">{{ t('data.age') }}: {{ astroData.moon_phase.age_days }} {{ t('data.days') }}</p>
         </div>
       </div>
 
-      <!-- Solstices (Full Width) -->
+      <!-- Solstices -->
       <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-3 p-6 flex flex-col md:flex-row justify-around items-center gap-6 mt-4">
         <div class="text-center">
             <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">Summer Solstice</div>
@@ -506,38 +460,13 @@ const formatTime = (iso) => {
   </div>
 </template>
 
-<script>
-// Non-setup script for simple helper if needed, but we can do it in setup.
-// Defining helpers in setup for cleaner template usage.
-const format_ephem_date = (iso) => {
-    if (!iso) return '--:--';
-    return new Date(iso).toLocaleTimeString([], {
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false
-    });
-}
-const formatDate = (iso) => {
-    if (!iso) return '---';
-    return new Date(iso).toLocaleDateString([], { month: 'long', day: 'numeric' });
-}
-</script>
-
 <style scoped>
-/* Custom Utilities for Glassmorphism & Wicca Theme */
-
 .glass-panel {
   @apply bg-midnight-900/60 backdrop-blur-md border border-emerald-900/30 rounded-xl shadow-2xl transition-all duration-300 hover:border-emerald-500/30 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)];
 }
 
 .input-field {
   @apply w-full bg-black/40 border border-emerald-900/50 rounded-lg py-2.5 pr-4 text-emerald-100 placeholder-emerald-800/50 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all font-mono text-sm;
-}
-
-/* Chrome/Safari/Edge date input styling fix for dark mode */
-.input-field::-webkit-calendar-picker-indicator {
-    filter: invert(1) opacity(0.5);
-    cursor: pointer;
 }
 
 .rune-button {

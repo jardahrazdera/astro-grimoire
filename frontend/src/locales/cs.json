@@ -1,0 +1,30 @@
+{
+  "title": "Astrální Grimoár",
+  "search": {
+    "placeholder": "Nahlédněte do hvězdných map (Hledat město...)",
+    "no_location": "Místo nebylo v hvězdných mapách nalezeno.",
+    "error": "Nebylo možné kontaktovat kartografa (Chyba geokódování)"
+  },
+  "sections": {
+    "sun_cycle": "Solární cyklus",
+    "moon_cycle": "Lunární cesta",
+    "moon_phase": "Aktuální fáze",
+    "cosmic_clock": "Vesmírný čas"
+  },
+  "data": {
+    "sunrise": "Východ slunce",
+    "sunset": "Západ slunce",
+    "day_length": "Délka dne",
+    "moonrise": "Východ měsíce",
+    "moonset": "Západ měsíce",
+    "transit": "Lunární tranzit",
+    "illumination": "Osvětlení",
+    "age": "Stáří měsíce",
+    "distance": "Vzdálenost",
+    "days": "dní"
+  },
+  "ui": {
+    "loading": "Naslouchám nebesům...",
+    "error_prefix": "Znamení chyby:"
+  }
+}

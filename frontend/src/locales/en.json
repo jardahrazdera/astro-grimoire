@@ -1,0 +1,30 @@
+{
+  "title": "Astro Grimoire",
+  "search": {
+    "placeholder": "Consult the star charts (Search city...)",
+    "no_location": "Location not found in the star charts.",
+    "error": "Could not consult the cartographer (Geocoding Error)"
+  },
+  "sections": {
+    "sun_cycle": "Solari Cycle",
+    "moon_cycle": "Lunar Path",
+    "moon_phase": "Current Phase",
+    "cosmic_clock": "Cosmic Time"
+  },
+  "data": {
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "day_length": "Day Length",
+    "moonrise": "Moonrise",
+    "moonset": "Moonset",
+    "transit": "Lunar Transit",
+    "illumination": "Illumination",
+    "age": "Moon Age",
+    "distance": "Distance",
+    "days": "days"
+  },
+  "ui": {
+    "loading": "Consulting the heavens...",
+    "error_prefix": "An omen of error:"
+  }
+}
