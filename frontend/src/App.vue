@@ -266,7 +266,7 @@ const toggleLocale = () => {
       <h1 class="font-wicca text-4xl sm:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-mystic-silver via-amber-100 to-mystic-silver drop-shadow-[0_0_10px_rgba(252,211,77,0.3)] mb-2">
         {{ t('title') }}
       </h1>
-      <p class="text-emerald-200/60 tracking-[0.2em] text-sm uppercase">Celestial Ephemeris & Lunation</p>
+      <p class="text-emerald-200/60 tracking-[0.2em] text-sm uppercase">{{ t('subtitle') }}</p>
     </header>
 
     <section class="z-10 mb-8">
@@ -278,7 +278,7 @@ const toggleLocale = () => {
         
         <div class="flex flex-col md:flex-row gap-4">
             <div class="flex-1 relative group">
-              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Realm</label>
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">{{ t('search.realm') }}</label>
               <div class="relative flex items-center">
                   <MapPin class="absolute left-3 text-emerald-500 w-4 h-4" />
                   <input 
@@ -328,7 +328,7 @@ const toggleLocale = () => {
             </div>
 
             <div class="w-full md:w-auto md:min-w-[200px]">
-              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">Era</label>
+              <label class="block text-emerald-100/50 text-xs uppercase tracking-widest mb-2 font-bold">{{ t('search.era') }}</label>
               <div class="relative">
                 <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
                 <input v-model="date" type="date" class="input-field pl-10" />
@@ -338,7 +338,7 @@ const toggleLocale = () => {
             <div class="flex items-end">
                 <button @click="fetchData" :disabled="loading || !lat || !lon" class="rune-button w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 h-[42px]">
                 <Loader2 v-if="loading" class="animate-spin w-4 h-4" />
-                <span v-else>Consult Stars</span>
+                <span v-else>{{ t('ui.consult_stars') }}</span>
                 </button>
             </div>
         </div>
@@ -355,7 +355,7 @@ const toggleLocale = () => {
 
         <div class="text-xs text-center">
             <button @click="showCoords = !showCoords" class="text-emerald-500/50 hover:text-emerald-400 underline decoration-dotted">
-                {{ showCoords ? 'Hide Coordinates' : 'Show Coordinates' }}
+                {{ showCoords ? t('data.hide_coords') : t('data.show_coords') }}
             </button>
             <div v-if="showCoords" class="mt-2 flex justify-center gap-4 text-emerald-100/40 font-mono transition-all">
                 <span>Lat: {{ lat }}</span>
@@ -432,7 +432,7 @@ const toggleLocale = () => {
             </div>
         </div>
         <div class="relative z-10 text-center">
-            <p class="text-xl text-white font-serif tracking-wide">{{ astroData.moon_phase.phase_name }}</p>
+            <p class="text-xl text-white font-serif tracking-wide">{{ t(`phases.${astroData.moon_phase.phase_name}`) }}</p>
             <p class="text-sm text-slate-400 mt-1">{{ t('data.age') }}: {{ astroData.moon_phase.age_days }} {{ t('data.days') }}</p>
         </div>
       </div>
@@ -440,17 +440,17 @@ const toggleLocale = () => {
       <!-- Solstices -->
       <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-3 p-6 flex flex-col md:flex-row justify-around items-center gap-6 mt-4">
         <div class="text-center">
-            <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">Summer Solstice</div>
+            <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">{{ t('data.summer_solstice') }}</div>
             <div class="font-wicca text-xl text-amber-100">{{ formatDate(astroData.solstices_current_year.summer_solstice) }}</div>
         </div>
         <div class="h-px w-20 bg-emerald-900 md:h-10 md:w-px"></div>
         <div class="text-center">
-             <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">Hemisphere</div>
-             <div class="font-wicca text-xl text-amber-100">{{ astroData.solstices_current_year.hemisphere }}</div>
+             <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">{{ t('data.hemisphere') }}</div>
+             <div class="font-wicca text-xl text-amber-100">{{ t(`hemispheres.${astroData.solstices_current_year.hemisphere}`) }}</div>
         </div>
         <div class="h-px w-20 bg-emerald-900 md:h-10 md:w-px"></div>
         <div class="text-center">
-            <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">Winter Solstice</div>
+            <div class="text-xs uppercase tracking-widest text-emerald-500 mb-1">{{ t('data.winter_solstice') }}</div>
             <div class="font-wicca text-xl text-amber-100">{{ formatDate(astroData.solstices_current_year.winter_solstice) }}</div>
         </div>
       </div>

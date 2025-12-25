@@ -1,9 +1,12 @@
 {
   "title": "Astrální Grimoár",
+  "subtitle": "Nebeský efemerid a lunace",
   "search": {
     "placeholder": "Nahlédněte do hvězdných map (Hledat město...)",
     "no_location": "Místo nebylo v hvězdných mapách nalezeno.",
-    "error": "Nebylo možné kontaktovat kartografa (Chyba geokódování)"
+    "error": "Nebylo možné kontaktovat kartografa (Chyba geokódování)",
+    "realm": "Říše",
+    "era": "Éra"
   },
   "sections": {
     "sun_cycle": "Solární cyklus",
@@ -21,10 +24,30 @@
     "illumination": "Osvětlení",
     "age": "Stáří měsíce",
     "distance": "Vzdálenost",
-    "days": "dní"
+    "days": "dní",
+    "summer_solstice": "Letní slunovrat",
+    "winter_solstice": "Zimní slunovrat",
+    "hemisphere": "Polokoule",
+    "show_coords": "Zobrazit souřadnice",
+    "hide_coords": "Skrýt souřadnice"
+  },
+  "phases": {
+    "New Moon": "Novoluní",
+    "Waxing Crescent": "Dorůstající srp",
+    "First Quarter": "První čtvrť",
+    "Waxing Gibbous": "Dorůstající měsíc",
+    "Full Moon": "Úplněk",
+    "Waning Gibbous": "Couvající měsíc",
+    "Last Quarter": "Poslední čtvrť",
+    "Waning Crescent": "Ubývající srp"
+  },
+  "hemispheres": {
+    "Northern": "Severní",
+    "Southern": "Jižní"
   },
   "ui": {
     "loading": "Naslouchám nebesům...",
-    "error_prefix": "Znamení chyby:"
+    "error_prefix": "Znamení chyby:",
+    "consult_stars": "Poradit se s hvězdami"
   }
 }

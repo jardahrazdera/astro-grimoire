@@ -1,9 +1,12 @@
 {
   "title": "Astro Grimoire",
+  "subtitle": "Celestial Ephemeris & Lunation",
   "search": {
     "placeholder": "Consult the star charts (Search city...)",
     "no_location": "Location not found in the star charts.",
-    "error": "Could not consult the cartographer (Geocoding Error)"
+    "error": "Could not consult the cartographer (Geocoding Error)",
+    "realm": "Realm",
+    "era": "Era"
   },
   "sections": {
     "sun_cycle": "Solari Cycle",
@@ -21,10 +24,30 @@
     "illumination": "Illumination",
     "age": "Moon Age",
     "distance": "Distance",
-    "days": "days"
+    "days": "days",
+    "summer_solstice": "Summer Solstice",
+    "winter_solstice": "Winter Solstice",
+    "hemisphere": "Hemisphere",
+    "show_coords": "Show Coordinates",
+    "hide_coords": "Hide Coordinates"
+  },
+  "phases": {
+    "New Moon": "New Moon",
+    "Waxing Crescent": "Waxing Crescent",
+    "First Quarter": "First Quarter",
+    "Waxing Gibbous": "Waxing Gibbous",
+    "Full Moon": "Full Moon",
+    "Waning Gibbous": "Waning Gibbous",
+    "Last Quarter": "Last Quarter",
+    "Waning Crescent": "Waning Crescent"
+  },
+  "hemispheres": {
+    "Northern": "Northern",
+    "Southern": "Southern"
   },
   "ui": {
     "loading": "Consulting the heavens...",
-    "error_prefix": "An omen of error:"
+    "error_prefix": "An omen of error:",
+    "consult_stars": "Consult Stars"
   }
 }
