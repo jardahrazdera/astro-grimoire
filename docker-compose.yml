@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.astro-backend.rule=Host(`api.astro.jaroslav.tech`)"
       - "traefik.http.routers.astro-backend.entrypoints=websecure"
-      - "traefik.http.routers.astro-backend.tls.certresolver=myresolver"
+      - "traefik.http.routers.astro-backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.astro-backend.loadbalancer.server.port=80"
 
   frontend:
@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.astro-frontend.rule=Host(`astro.jaroslav.tech`)"
       - "traefik.http.routers.astro-frontend.entrypoints=websecure"
-      - "traefik.http.routers.astro-frontend.tls.certresolver=myresolver"
+      - "traefik.http.routers.astro-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.astro-frontend.loadbalancer.server.port=80"
 
 networks:
