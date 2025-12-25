@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import { 
   Moon, 
@@ -15,11 +15,22 @@ import {
 } from 'lucide-vue-next';
 import MoonPhase from './components/MoonPhase.vue';
 import CosmicClock from './components/CosmicClock.vue';
+import bgImage from './assets/background.webp';
 
 // --- State ---
 const loading = ref(false);
 const error = ref(null);
 const astroData = ref(null);
+
+// Parallax State
+const mouseX = ref(0);
+const mouseY = ref(0);
+
+const handleMouseMove = (event) => {
+  // Normalize coordinates from center of screen (-1 to 1)
+  mouseX.value = (event.clientX / window.innerWidth) * 2 - 1;
+  mouseY.value = (event.clientY / window.innerHeight) * 2 - 1;
+};
 
 // Form Inputs
 const searchQuery = ref('');
@@ -180,9 +191,14 @@ const fetchData = async () => {
 
 // Initial fetch
 onMounted(() => {
+  window.addEventListener('mousemove', handleMouseMove);
   if (lat.value && lon.value) {
     fetchData();
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', handleMouseMove);
 });
 
 // --- Formatters ---
@@ -196,6 +212,17 @@ const formatTime = (isoString) => {
 <template>
   <div class="min-h-screen bg-midnight-950 bg-star-pattern text-mystic-silver font-sans selection:bg-emerald-900 selection:text-amber-100 flex flex-col items-center p-4 sm:p-8 relative overflow-hidden">
     
+    <!-- Mystical Background Texture -->
+    <div 
+      class="fixed inset-0 z-0 opacity-10 pointer-events-none transition-transform duration-[2000ms] ease-out"
+      :style="{ 
+        backgroundImage: `url(${bgImage})`, 
+        backgroundRepeat: 'repeat',
+        backgroundSize: 'auto',
+        transform: `translate(${mouseX * 30}px, ${mouseY * 30}px) scale(1.1)` 
+      }"
+    ></div>
+
     <!-- Ambient Background Glow -->
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/20 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
