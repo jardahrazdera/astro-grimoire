@@ -38,6 +38,21 @@ const handleMouseMove = (event) => {
   cursorY.value = event.clientY;
 };
 
+const handleDeviceOrientation = (event) => {
+  if (!event.gamma || !event.beta) return;
+
+  // Gamma: Left/Right tilt (-90 to 90). 
+  // We clamp to -45 to 45 for a -1 to 1 range.
+  const tiltX = Math.max(-45, Math.min(45, event.gamma));
+  mouseX.value = tiltX / 45;
+
+  // Beta: Front/Back tilt (-180 to 180). 
+  // Users typically hold phone at 45 degrees. 
+  // We map 0 to 90 (resting range) to -1 to 1.
+  const tiltY = Math.max(0, Math.min(90, event.beta));
+  mouseY.value = (tiltY - 45) / 45; 
+};
+
 // Form Inputs
 const searchQuery = ref('');
 const lat = ref(null);
@@ -198,6 +213,7 @@ const fetchData = async () => {
 // Initial fetch
 onMounted(() => {
   window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('deviceorientation', handleDeviceOrientation);
   if (lat.value && lon.value) {
     fetchData();
   }
@@ -205,6 +221,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('mousemove', handleMouseMove);
+  window.removeEventListener('deviceorientation', handleDeviceOrientation);
 });
 
 // --- Formatters ---
