@@ -95,12 +95,12 @@ const pathD = computed(() => {
 
 <template>
   <div class="relative w-full h-full flex items-center justify-center">
-    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_15px_rgba(255,220,164,0.3)]">
         <!-- Background (Shadow part) -->
         <circle cx="50" cy="50" r="45" class="fill-slate-900 stroke-slate-700 stroke-[0.5]" />
         
         <!-- Lit part -->
-        <path :d="pathD" class="fill-mystic-silver transition-all duration-1000 ease-out" />
+        <path :d="pathD" fill="#ffdca4" class="transition-all duration-1000 ease-out" />
         
         <!-- Crater Texture Overlay (Optional, simple noise) -->
         <filter id="noise">
