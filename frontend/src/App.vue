@@ -422,26 +422,30 @@ const formatTime = (isoString) => {
       </div>
 
       <!-- Moon Phase Card (Featured) -->
-      <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col items-center justify-center text-center p-8 relative overflow-hidden group">
+      <div class="glass-panel col-span-1 md:col-span-2 lg:col-span-1 flex flex-col items-center justify-between p-6 relative overflow-hidden group">
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
         
-        <h2 class="font-wicca text-2xl text-amber-100 mb-6 relative">Current Phase</h2>
+        <h3 class="font-wicca text-2xl text-amber-100 flex items-center justify-center gap-2 mb-2 relative z-10">
+          Current Phase
+        </h3>
         
         <!-- Simplified Moon Representation -->
-        <div class="relative w-32 h-32 mb-6 rounded-full shadow-[0_0_50px_rgba(255,255,255,0.1)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
-             <MoonPhase 
-                :percent="astroData.moon_phase.illumination_percent" 
-                :phase="astroData.moon_phase.phase_name"
-                :hemisphere="astroData.solstices_current_year.hemisphere"
-             />
-             <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                <span class="bg-midnight-950/40 backdrop-blur-[2px] px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-white/10 shadow-lg">
-                    {{ astroData.moon_phase.illumination_percent }}%
-                </span>
-             </div>
+        <div class="flex-1 flex items-center justify-center py-4 relative z-10">
+             <div class="relative w-32 h-32 rounded-full shadow-[0_0_50px_rgba(255,255,255,0.1)] bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden">
+                 <MoonPhase 
+                    :percent="astroData.moon_phase.illumination_percent" 
+                    :phase="astroData.moon_phase.phase_name"
+                    :hemisphere="astroData.solstices_current_year.hemisphere"
+                 />
+                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                    <span class="bg-midnight-950/40 backdrop-blur-[2px] px-2 py-0.5 rounded-full text-[10px] font-bold text-white border border-white/10 shadow-lg">
+                        {{ astroData.moon_phase.illumination_percent }}%
+                    </span>
+                 </div>
+            </div>
         </div>
 
-        <div class="relative">
+        <div class="relative z-10 text-center">
             <p class="text-xl text-white font-serif tracking-wide">{{ astroData.moon_phase.phase_name }}</p>
             <p class="text-sm text-slate-400 mt-1">Age: {{ astroData.moon_phase.age_days }} days</p>
         </div>
