@@ -1,0 +1,64 @@
+name: Build and Deploy to Server
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  BACKEND_IMAGE: ghcr.io/jardahrazdera/astro-grimoire-backend
+  FRONTEND_IMAGE: ghcr.io/jardahrazdera/astro-grimoire-frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.FRONTEND_IMAGE }}:latest
+          build-args: |
+            VITE_API_URL=https://api.astro.jaroslav.tech
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/stacks/3-apps/astro.jaroslav.tech
+            git pull origin master
+            
+            # Login is not strictly needed for public GHCR images, 
+            # but included if you use private ones in the future.
+            # echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            
+            docker compose pull
+            docker compose up -d --remove-orphans
