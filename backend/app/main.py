@@ -96,11 +96,11 @@ def get_hemisphere(lat: float) -> str:
 
 
 def format_ephem_date(ephem_date) -> str:
-    """Converts ephem date object to ISO format string."""
+    """Converts ephem date object to ISO format string with UTC suffix."""
     try:
         # ephem.Date can be converted to datetime
         dt = ephem.Date(ephem_date).datetime()
-        return dt.isoformat()
+        return dt.isoformat() + "Z"
     except Exception:
         return None
 
