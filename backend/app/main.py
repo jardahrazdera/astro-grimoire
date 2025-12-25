@@ -175,23 +175,6 @@ async def search_location(
             
             place_name = city or town or village or hamlet or suburb or muni or loc.get("display_name", "").split(",")[0]
             
-            # --- NAME FILTERING ---
-            query_lower = q.lower().strip()
-            possible_names = [city, town, village, hamlet, suburb, muni, loc.get("display_name", "").split(",")[0]]
-            
-            is_match = False
-            for name in possible_names:
-                # Check if query is a substring of any place name field
-                if name and query_lower in name.lower():
-                    is_match = True
-                    # If the name starts with the query, it's a better candidate for short_name
-                    if name.lower().startswith(query_lower):
-                        place_name = name
-                    break
-            
-            if not is_match:
-                continue
-
             # Store result with importance for sorting
             importance = loc.get("importance", 0)
             
