@@ -394,7 +394,7 @@ const formatTime = (isoString) => {
 
       <!-- Sun Cycle -->
       <div class="glass-panel p-6 flex flex-col justify-between">
-        <h3 class="font-wicca text-xl text-amber-500/80 flex items-center gap-2 mb-4">
+        <h3 class="font-wicca text-xl text-amber-500/80 flex items-center justify-center gap-2 mb-4">
           <Sun class="w-5 h-5" /> Sun Cycle
         </h3>
         <div class="space-y-4">
@@ -441,7 +441,7 @@ const formatTime = (isoString) => {
 
       <!-- Moon Cycle -->
       <div class="glass-panel p-6 flex flex-col justify-between">
-        <h3 class="font-wicca text-xl text-indigo-300 flex items-center gap-2 mb-4">
+        <h3 class="font-wicca text-xl text-indigo-300 flex items-center justify-center gap-2 mb-4">
           <Moon class="w-5 h-5" /> Moon Cycle
         </h3>
         <div class="space-y-4">
