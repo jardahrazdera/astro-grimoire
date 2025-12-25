@@ -260,10 +260,11 @@ async def get_astro_data(
     try:
         # 1. Setup Observer
         observer = ephem.Observer()
-        observer.lat = str(
-            lat
-        )  # ephem expects string or float radians, string is safer for degrees
+        observer.lat = str(lat)
         observer.lon = str(lon)
+        observer.elevation = 0  # Default elevation
+        observer.pressure = 1013.25 # Standard pressure for refraction
+        observer.horizon = '-0:34'  # Standard sunrise/sunset definition (34 arcminutes below horizon)
 
         # Set date or use current UTC time
         if date_str:
@@ -282,35 +283,44 @@ async def get_astro_data(
         moon.compute(observer)
 
         # 3. Calculate Rise and Set times
-        # Note: rising/setting functions return the *next* event from observer.date
-        # We want the events for the "current day".
-        # Strategy: Set observer to midnight of the target date to find events for that 24h period.
-
-        midnight_observer = ephem.Observer()
-        midnight_observer.lat = observer.lat
-        midnight_observer.lon = observer.lon
-        midnight_observer.date = target_date.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-
-        def get_times(body, obs):
-            times = {
+        # Strategy: Set observer to noon of the target date to ensure we find 
+        # the rise/set times occurring on THIS specific day reliably.
+        noon_of_day = target_date.replace(hour=12, minute=0, second=0, microsecond=0)
+        
+        # We search backwards from noon for the rise and forwards from noon for the set
+        # of the current 24h period.
+        
+        def get_times_precise(body, obs_noon):
+            data = {
                 "rise": None,
                 "set": None,
                 "is_always_up": False,
                 "is_always_down": False,
             }
             try:
-                times["rise"] = format_ephem_date(obs.next_rising(body))
-                times["set"] = format_ephem_date(obs.next_setting(body))
+                # To find the events for the current calendar day, 
+                # we search from midnight to midnight.
+                midnight = obs_noon.date - 0.5
+                obs_rising = ephem.Observer()
+                obs_rising.lat, obs_rising.lon, obs_rising.elevation = obs_noon.lat, obs_noon.lon, obs_noon.elevation
+                obs_rising.pressure, obs_rising.horizon = obs_noon.pressure, obs_noon.horizon
+                obs_rising.date = midnight
+                
+                # next_rising gives the first rising AFTER midnight
+                data["rise"] = format_ephem_date(obs_rising.next_rising(body))
+                # next_setting gives the first setting AFTER midnight
+                data["set"] = format_ephem_date(obs_rising.next_setting(body))
+                
             except ephem.AlwaysUpError:
-                times["is_always_up"] = True
+                data["is_always_up"] = True
             except ephem.AlwaysDownError:
-                times["is_always_down"] = True
-            return times
+                data["is_always_down"] = True
+            except Exception:
+                pass
+            return data
 
-        sun_data = get_times(ephem.Sun(), midnight_observer)
-        moon_data = get_times(ephem.Moon(), midnight_observer)
+        sun_data = get_times_precise(ephem.Sun(), observer)
+        moon_data = get_times_precise(ephem.Moon(), observer)
 
         # 4. Moon Phase Calculation
         # illumination is percentage (0-100)
