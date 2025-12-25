@@ -2,11 +2,11 @@
   "title": "Astrální Grimoár",
   "subtitle": "Nebeský efemerid a lunace",
   "search": {
-    "placeholder": "Nahlédněte do hvězdných map (Hledat město...)",
+    "placeholder": "Zadejte město (např. Praha, Brno)",
     "no_location": "Místo nebylo v hvězdných mapách nalezeno.",
     "error": "Nebylo možné kontaktovat kartografa (Chyba geokódování)",
-    "realm": "Říše",
-    "era": "Éra"
+    "realm": "Místo",
+    "era": "Datum"
   },
   "sections": {
     "sun_cycle": "Solární cyklus",

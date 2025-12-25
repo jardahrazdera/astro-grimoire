@@ -2,11 +2,11 @@
   "title": "Astro Grimoire",
   "subtitle": "Celestial Ephemeris & Lunation",
   "search": {
-    "placeholder": "Consult the star charts (Search city...)",
+    "placeholder": "Enter city (e.g. Prague, Salem)",
     "no_location": "Location not found in the star charts.",
     "error": "Could not consult the cartographer (Geocoding Error)",
-    "realm": "Realm",
-    "era": "Era"
+    "realm": "Place",
+    "era": "Date"
   },
   "sections": {
     "sun_cycle": "Solari Cycle",
